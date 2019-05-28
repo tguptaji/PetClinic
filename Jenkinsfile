@@ -5,13 +5,13 @@ node {
     properties([
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '5')),
         disableConcurrentBuilds(),
-        [$class: 'GithubProjectProperty', displayName: '', projectUrlStr: 'https://github.com/gouthamchilakala/PetClinic.git/'],
+        [$class: 'GithubProjectProperty', displayName: '', projectUrlStr: 'https://github.com/tguptaji/PetClinic.git/'],
         [$class: 'ThrottleJobProperty', categories: [], limitOneJobWithMatchingParams: false, maxConcurrentPerNode: 0, maxConcurrentTotal: 0, paramsToUseForLimit: '', throttleEnabled: true, throttleOption: 'project'],
         pipelineTriggers([githubPush()]),
         parameters([string(defaultValue: 'DEV', description: 'env name', name: 'environment', trim: false)])
     ])
     stage('Checkout SCM'){
-        git branch: 'master', credentialsId: 'github-creds', url: 'https://github.com/gouthamchilakala/PetClinic'
+        git branch: 'master', credentialsId: 'github-creds', url: 'https://github.com/tguptaji/PetClinic'
     }
     stage('Read praram'){
         echo "The environment chosen during the Job execution is ${params.environment}"
@@ -33,12 +33,12 @@ node {
     }
     stage('Deploy To Tomcat'){
         sshagent(['test']) {
-            sh 'scp -o StrictHostKeyChecking=no target/*.war ec2-user@ec2-3-83-166-58.compute-1.amazonaws.com:/opt/apache-tomcat-7.0.94/webapps/'
+            sh 'scp -o StrictHostKeyChecking=no target/*.war root@13.233.87.117:/opt/apache-tomcat-7.0.94/webapps/'
         }
     }
     stage('Smoke Test'){
         sleep 5
-        sh "curl ec2-3-83-166-58.compute-1.amazonaws.com:8080/petclinic"
+        sh "curl 13.233.87.117:8080/petclinic"
     }
 
 }
